@@ -1,0 +1,92 @@
+class Node {
+    constructor(data) {
+        this.data = data;
+        this.next = null;
+    }
+}
+
+class LinkedList {
+    constructor() {
+        this.head = null;
+    }
+
+    append(data) {
+        if (!this.head) {
+            this.head = new Node(data);
+            return;
+        }
+        let temp = this.head;
+        while (temp.next) {
+            temp = temp.next;
+        }
+        temp.next = new Node(data);
+    }
+
+    printList() {
+        let temp = this.head;
+        while (temp) {
+            process.stdout.write(temp.data + " ");
+            temp = temp.next;
+        }
+        console.log();
+    }
+
+    lenOfLL(head) {
+        let temp = head;
+        let count = 0;
+        while (temp) {
+            count++;
+            temp = temp.next;
+        }
+        return count;
+    }
+
+    reverseInKGroups(head, k) {
+        let prev = null;
+        let curr = head;
+        let nextNode = null;
+        let count = 0;
+
+        if (curr === null) return head;
+
+        while (count < k && curr !== null) {
+            nextNode = curr.next;
+            curr.next = prev;
+            prev = curr;
+            curr = nextNode;
+            count++;
+        }
+
+        if (nextNode !== null) {
+            head.next = this.reverseInKGroups(nextNode, k);
+        }
+        return prev;
+    }
+
+    reverseIt(head, k) {
+        return this.reverseInKGroups(head, k);
+    }
+}
+
+// Driver code to test above function
+function main() {
+    const input = [
+        { n: 5, values: [1, 2, 3, 4, 5], k: 2 },
+        { n: 6, values: [1, 2, 3, 4, 5, 6], k: 3 }
+    ];
+
+    input.forEach(testCase => {
+        const ll = new LinkedList();
+        testCase.values.forEach(value => ll.append(value));
+        
+        console.log(`Original list:`);
+        ll.printList();
+
+        ll.head = ll.reverseIt(ll.head, testCase.k);
+
+        console.log(`Reversed in groups of ${testCase.k}:`);
+        ll.printList();
+    });
+}
+
+main();
