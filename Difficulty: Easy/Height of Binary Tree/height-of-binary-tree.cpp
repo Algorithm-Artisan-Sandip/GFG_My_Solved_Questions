@@ -97,19 +97,57 @@ struct Node
 };
 */
 
+// Approach 1 : Recursive Approach : 
+// class Solution{
+//     public:
+//     //Function to find the height of a binary tree.
+//     int height(struct Node* node){
+//         // code here
+//         if(node == NULL) return 0;
+        
+//         int leftSubtreeDepth = height(node->left);
+//         int rightSubtreeDepth = height(node->right);
+//         int maxDepth = max(leftSubtreeDepth , rightSubtreeDepth) + 1;
+        
+//         return maxDepth;
+//     }
+// };
 
+// Approach 2 : Level Order Traversal Approach.
 class Solution{
     public:
-    //Function to find the height of a binary tree.
-    int height(struct Node* node){
-        // code here
-        if(node == NULL) return 0;
+    int height(struct Node* node) {
+        if(node == NULL) {
+            return 0;
+        }
         
-        int leftSubtreeDepth = height(node->left);
-        int rightSubtreeDepth = height(node->right);
-        int maxDepth = max(leftSubtreeDepth , rightSubtreeDepth) + 1;
+        queue<Node*> q;
+        q.push(node);
+        q.push(NULL);
+        int count = 1;
         
-        return maxDepth;
+        
+        while(!q.empty()) {
+            Node* currNode = q.front();
+            q.pop();
+            
+            if(currNode == NULL){
+                if(!q.empty()) {
+                    q.push(NULL);
+                    count++;
+                }
+            }
+            else {
+                if(currNode->left != NULL) {
+                    q.push(currNode->left);
+                }
+                if(currNode->right != NULL) {
+                    q.push(currNode->right);
+                }
+            }
+        }
+        
+        return count;
     }
 };
 
