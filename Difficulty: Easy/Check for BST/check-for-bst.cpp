@@ -17,27 +17,50 @@ struct Node {
 
 
 // } Driver Code Ends
+
+
+// Approach 1 :
+// class Solution {
+//   public:
+//     void inOrder(Node* root, vector<int>& arr) {
+//         if(root == NULL) return;
+        
+//         inOrder(root->left, arr);
+//         arr.push_back(root->data);
+//         inOrder(root->right, arr);
+//     }
+    
+//     bool isBST(Node* root) {
+//         vector<int> arr;
+        
+//         inOrder(root, arr);
+        
+//         for(int i=0; i<arr.size()-1; i++) {
+//             if(arr[i] >= arr[i+1]) return false;
+//         }
+//         return true;
+//     }
+// };
+
+
+// Approach 2 : 
 class Solution {
   public:
-    // Function to check whether a Binary Tree is BST or not.
-    void inOrder(Node* root, vector<int>& arr) {
-        if(root == NULL) return;
+    bool inOrder(Node* root, long long int lb, long long int ub) {
+        if(root == NULL) return true;
         
-        inOrder(root->left, arr);
-        arr.push_back(root->data);
-        inOrder(root->right, arr);
+        bool cond1 = (root->data > lb);
+        bool cond2 = (root->data < ub);
+        bool leftAns = inOrder(root->left, lb, root->data);
+        bool rightAns = inOrder(root->right, root->data, ub);
+        
+        return (cond1 && cond2 && leftAns && rightAns);
     }
     
     bool isBST(Node* root) {
-        // Your code here
-        vector<int> arr;
-        
-        inOrder(root, arr);
-        
-        for(int i=0; i<arr.size()-1; i++) {
-            if(arr[i] >= arr[i+1]) return false;
-        }
-        return true;
+        long long int lowerBound = -2147483657;
+        long long int upperBound = 2147483657;
+        return inOrder(root, lowerBound, upperBound);
     }
 };
 
