@@ -6,26 +6,63 @@ using namespace std;
 
 // } Driver Code Ends
 //User function template for C++
-
-class Solution{
-    public:
-    // arr : given array
+// arr : given array
     // l : starting index of the array i.e 0
     // r : ending index of the array i.e size-1
     // k : find kth smallest element and return using this function
+
+
+// Approach 1 : Using sort function :
+// class Solution{
+//     public:
+//     int kthSmallest(int arr[], int l, int r, int k) {
+//         sort(arr, arr + r+1);
+//         return arr[k-1];
+//     }
+// };
+
+// Approach 2 : Using priority queue : S.C : O(n)
+// class Solution{
+//     public:
+//     int kthSmallest(int arr[], int l, int r, int k) {
+//         //code here
+//         priority_queue<int, vector<int>, greater<int>> pq;
+//         for(int i=l; i<=r; i++) {
+//             pq.push(arr[i]);
+//         }
+//         while(k-1) {
+//             pq.pop();
+//             k--;
+//         }
+//         return pq.top();
+//     }
+// };
+
+// Approach 3 : More efficient : S.C. : O(k)
+class Solution {
+public:
     int kthSmallest(int arr[], int l, int r, int k) {
-        //code here
-        priority_queue<int, vector<int>, greater<int>> pq;
-        for(int i=l; i<=r; i++) {
+        // Max heap
+        priority_queue<int> pq;
+
+        // Store the first k elements in the priority queue
+        for(int i = l; i < l + k; i++) {
             pq.push(arr[i]);
         }
-        while(k-1) {
-            pq.pop();
-            k--;
+
+        // Process the remaining elements
+        for(int i = l + k; i <= r; i++) {
+            if(arr[i] < pq.top()) {
+                pq.pop();
+                pq.push(arr[i]);
+            }
         }
+
         return pq.top();
     }
 };
+
+
 
 //{ Driver Code Starts.
  
