@@ -1,34 +1,30 @@
 //{ Driver Code Starts
-//Initial template code for C++
-
 #include <bits/stdc++.h>
 using namespace std;
 
-struct Node
-{
+struct Node {
     int data;
     Node* next;
-    
-    Node(int val)
-    {
+
+    Node(int val) {
         data = val;
-        next = NULL;
+        next = nullptr;
     }
 };
 
-void loopHere(Node* head, Node* tail, int position)
-{
-    if(position==0) return;
-    
+void loopHere(Node* head, Node* tail, int position) {
+    if (position == 0)
+        return;
+
     Node* walk = head;
-    for(int i=1; i<position; i++)
+    for (int i = 1; i < position; i++)
         walk = walk->next;
     tail->next = walk;
 }
 
 
 // } Driver Code Ends
-//User function template for C++
+// User function template for C++
 
 /*
 
@@ -42,18 +38,22 @@ struct Node
     }
 
 */
-class Solution
-{
-    public:
-    //Function to check if the linked list has a loop.
-    bool detectLoop(Node* head)
-    {
-        Node* temp = head;
-        map<Node*, bool> table;
-        while(temp != NULL) {
-            if(table[temp] == true) return true;
-            table[temp] = true;
-            temp = temp->next;
+
+// Approach 1 : Hare & Tortoise Algo Or Floyd's Cycle
+// Detection Algorithm : BEST
+class Solution {
+  public:
+    // Function to check if the linked list has a loop.
+    bool detectLoop(Node* head) {
+        // your code here
+        Node* fast = head;
+        Node* slow = head;
+        while(fast != NULL) {
+            fast = fast->next;
+            slow = slow->next;
+            if(fast != NULL) fast = fast->next;
+            else return false;
+            if(slow == fast) return true;
         }
         return false;
     }
@@ -62,37 +62,57 @@ class Solution
 
 //{ Driver Code Starts.
 
-int main()
-{
+int main() {
     int t;
-    cin>>t;
-    while(t--)
-    {
-        int n, num;
-        cin>>n;
-        
-        Node *head, *tail;
-        cin>> num;
-        head = tail = new Node(num);
-        
-        for(int i=0 ; i<n-1 ; i++)
-        {
-            cin>> num;
-            tail->next = new Node(num);
-            tail = tail->next;
+    cin >> t;
+    cin.ignore();
+
+    while (t--) {
+        vector<int> arr;
+        string input;
+        getline(cin, input);
+        stringstream ss(input);
+        int number;
+
+        while (ss >> number) {
+            arr.push_back(number);
         }
-        
+
         int pos;
-        cin>> pos;
-        loopHere(head,tail,pos);
-        
+        cin >> pos;
+        cin.ignore();
+
+        Node* head = nullptr;
+        Node* tail = nullptr;
+
+        if (!arr.empty()) {
+            head = new Node(arr[0]);
+            tail = head;
+            for (size_t i = 1; i < arr.size(); ++i) {
+                tail->next = new Node(arr[i]);
+                tail = tail->next;
+            }
+            loopHere(head, tail, pos);
+        }
+
         Solution ob;
-        if(ob.detectLoop(head) )
-            cout<< "True\n";
+        if (ob.detectLoop(head))
+            cout << "true\n";
         else
-            cout<< "False\n";
+            cout << "false\n";
+
+        // Free the allocated memory
+        unordered_set<Node*> visited;
+        Node* current = head;
+        while (current && visited.find(current) == visited.end()) {
+            visited.insert(current);
+            Node* temp = current;
+            current = current->next;
+            delete temp;
+        }
     }
-	return 0;
+
+    return 0;
 }
 
 // } Driver Code Ends
