@@ -30,28 +30,19 @@ int main() {
 
 
 //User function Template for C++
-int binSearch(int nums[], int target, int idx,int size) {
-    int left = idx+1;
-    int right = size-1;
+
+int sumExists(int arr[], int n, int sum){
     
-
-    while(left <= right) {
-        int mid = left + (right-left)/2;
-        if(nums[mid] == target) return mid;
-        else if(nums[mid] > target) right = mid-1;
-        else left = mid+1;
-    }
-    return -1;
-}
-
-int sumExists(int nums[], int size, int target){
-    sort(nums, nums+size);
     
-    for(int i=0; i <size; i++) {
-        int first = i;
-        int last = binSearch(nums, target-nums[i], first, size);
-        if(last != -1) return 1;
+    unordered_map<int, int> mpp;
+    for(int i=0; i<n; i++)
+        mpp[arr[i]] = i;
+    
+    for(int i=0; i<n; i++) {
+        int more = sum - arr[i];
+        if(mpp.find(more) != mpp.end() && mpp[more] != i)
+            return 1;
     }
-
+    
     return 0;
 }
