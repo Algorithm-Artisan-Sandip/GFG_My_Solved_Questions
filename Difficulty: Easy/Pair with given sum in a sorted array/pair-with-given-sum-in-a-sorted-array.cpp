@@ -7,19 +7,24 @@ using namespace std;
 
 class Solution {
   public:
-    int countPair(int target, vector<int> &arr) {
-        int size = arr.size();
+    int countPair(int k, vector<int> &arr) {
+        int left = 0, right = arr.size()-1;
         int count = 0;
         
-        for(int i=0; i<size; i++) {
-            // handling the bou
-            if(binary_search(arr.begin()+i+1, arr.end(), target-arr[i])) count++;
+        while(left < right) {
+            int sum = arr[left] + arr[right];
+            if(sum < k) left++;
+            else if(sum > k) right--;
+            else {
+                count++;
+                left++; 
+                right--;
+            }
         }
         
         return count;
     }
 };
-
 
 //{ Driver Code Starts.
 int main() {
