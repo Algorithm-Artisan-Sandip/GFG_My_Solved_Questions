@@ -45,39 +45,39 @@ class Matrix {
 
 
 // } Driver Code Ends
-
 // User function template for C++
-class Solution {
-  private:
-    int binSearch(const vector<int>& nums, int target, int idx) {
-        int left = idx + 1;
-        int right = nums.size() - 1;
-        while (left <= right) {
-            int mid = left + (right - left) / 2;
-            if (nums[mid] == target) return mid;
-            else if (nums[mid] > target) right = mid - 1;
-            else left = mid + 1;
-        }
-        return -1;
-    }
 
+class Solution {
   public:
     vector<vector<int>> getPairs(vector<int>& arr) {
-        int size = arr.size();
+        int n = arr.size();
         vector<vector<int>> ans;
-
+        
+        // sorting the original array : 
         sort(arr.begin(), arr.end());
-
-        set<pair<int, int>> st; 
-
-        for (int i = 0; i < size; i++) {
-            int j = binSearch(arr, -arr[i], i);
-            if (j != -1)
-                st.insert({min(arr[i], arr[j]), max(arr[i], arr[j])});
+        
+        int left = 0, right = n-1;
+        
+        while(left < right) {
+            int currSum = arr[left] + arr[right];
+            if(currSum > 0)
+                right--;
+            else if(currSum < 0)
+                left++;
+            else {
+               ans.push_back({arr[left], arr[right]});
+               
+               // for eliminating the duplicate cases : 
+               int tempLeft = left, tempRight = right;
+               while(left<right && arr[left] == arr[tempLeft]) {
+                   left++;
+               }
+               while(left<right && arr[right] == arr[tempRight]) {
+                   right--;
+               }
+            }
+                
         }
-
-        for (const auto& it : st)
-            ans.push_back({it.first, it.second});
         
         return ans;
     }
