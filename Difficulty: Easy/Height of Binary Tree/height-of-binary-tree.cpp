@@ -1,169 +1,126 @@
 //{ Driver Code Starts
-//Initial template for C++
-
 #include <bits/stdc++.h>
 using namespace std;
 
-struct Node
-{
+class Node {
+  public:
     int data;
-    struct Node *left;
-    struct Node *right;
+    Node* left;
+    Node* right;
 
     Node(int val) {
         data = val;
         left = right = NULL;
     }
-}; 
+};
 
 // Function to Build Tree
-Node* buildTree(string str)
-{   
+Node* buildTree(string str) {
     // Corner Case
-    if(str.length() == 0 || str[0] == 'N')
-            return NULL;
-    
-    // Creating vector of strings from input 
-    // string after spliting by space
+    if (str.length() == 0 || str[0] == 'N')
+        return NULL;
+
+    // Creating vector of strings from input
+    // string after splitting by space
     vector<string> ip;
-    
+
     istringstream iss(str);
-    for(string str; iss >> str; )
+    for (string str; iss >> str;)
         ip.push_back(str);
-        
+
     // Create the root of the tree
-    Node *root = new Node(stoi(ip[0]));
-        
+    Node* root = new Node(stoi(ip[0]));
+
     // Push the root to the queue
     queue<Node*> queue;
     queue.push(root);
-        
+
     // Starting from the second element
     int i = 1;
-    while(!queue.empty() && i < ip.size()) {
-            
+    while (!queue.empty() && i < ip.size()) {
         // Get and remove the front of the queue
         Node* currNode = queue.front();
         queue.pop();
-            
+
         // Get the current node's value from the string
         string currVal = ip[i];
-            
-        // If the left child is not null
-        if(currVal != "N") {
 
+        // If the left child is not null
+        if (currVal != "N") {
             // Create the left child for the current Node
             currNode->left = new Node(stoi(currVal));
-                
             // Push it to the queue
             queue.push(currNode->left);
         }
-            
+
         // For the right child
         i++;
-        if(i >= ip.size())
+        if (i >= ip.size())
             break;
         currVal = ip[i];
-            
+
         // If the right child is not null
-        if(currVal != "N") {
-                
+        if (currVal != "N") {
             // Create the right child for the current node
             currNode->right = new Node(stoi(currVal));
-                
             // Push it to the queue
             queue.push(currNode->right);
         }
         i++;
     }
-    
+
     return root;
 }
 
+
 // } Driver Code Ends
-//User function template for C++
+// User function template for C++
 
 /*
-struct Node
-{
+class Node {
+public:
     int data;
-    struct Node* left;
-    struct Node* right;
-    
-    Node(int x){
-        data = x;
+    Node* left;
+    Node* right;
+
+    Node(int val) {
+        data = val;
         left = right = NULL;
     }
 };
 */
-
-// Approach 1 : Recursive Approach : 
-// class Solution{
-//     public:
-//     //Function to find the height of a binary tree.
-//     int height(struct Node* node){
-//         // code here
-//         if(node == NULL) return 0;
-        
-//         int leftSubtreeDepth = height(node->left);
-//         int rightSubtreeDepth = height(node->right);
-//         int maxDepth = max(leftSubtreeDepth , rightSubtreeDepth) + 1;
-        
-//         return maxDepth;
-//     }
-// };
-
-// Approach 2 : Level Order Traversal Approach.
 class Solution{
     public:
-    int height(struct Node* node) {
-        if(node == NULL) {
-            return 0;
-        }
+    int height(struct Node* node){
+        // Base case: If the node is NULL, return -1 (empty tree has height -1)
+        if(node == NULL) return -1;
         
-        queue<Node*> q;
-        q.push(node);
-        q.push(NULL);
-        int count = 1;
+        int leftSubtreeDepth = height(node->left);
+        int rightSubtreeDepth = height(node->right);
         
-        
-        while(!q.empty()) {
-            Node* currNode = q.front();
-            q.pop();
-            
-            if(currNode == NULL){
-                if(!q.empty()) {
-                    q.push(NULL);
-                    count++;
-                }
-            }
-            else {
-                if(currNode->left != NULL) {
-                    q.push(currNode->left);
-                }
-                if(currNode->right != NULL) {
-                    q.push(currNode->right);
-                }
-            }
-        }
-        
-        return count;
+        return max(leftSubtreeDepth, rightSubtreeDepth) + 1;
     }
 };
 
+
+
+
 //{ Driver Code Starts.
-int main()
-{
+
+int main() {
     int t;
-	scanf("%d ",&t);
-    while(t--)
-    {
+    scanf("%d ", &t);
+    while (t--) {
         string treeString;
-		getline(cin,treeString);
-		Node* root = buildTree(treeString);
+        getline(cin, treeString);
+        Node* root = buildTree(treeString);
         Solution ob;
-		cout<<ob.height(root)<<endl;
+        cout << ob.height(root) << endl;
+
+        cout << "~"
+             << "\n";
     }
     return 0;
 }
+
 // } Driver Code Ends
