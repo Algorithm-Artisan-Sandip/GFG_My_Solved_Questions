@@ -8,20 +8,15 @@ using namespace std;
 // } Driver Code Ends
 // User function Template for C++
 
+
 class Solution {
   public:
     void rotate(vector<int> &arr) {
-        // code here
-        int size = arr.size();
-        int temp = arr[size-1];
-        
-        for(int i=size-1; i>=1; i--) {
-            arr[i] = arr[i-1];
-        }
-        
-        arr[0] = temp;
+        std::rotate(arr.begin(), arr.end()-1, arr.end());
     }
 };
+
+
 
 //{ Driver Code Starts.
 
@@ -44,6 +39,7 @@ int main() {
             cout << arr[i] << " ";
         }
         cout << endl;
+        cout << "~" << endl;
     }
     return 0;
 }
