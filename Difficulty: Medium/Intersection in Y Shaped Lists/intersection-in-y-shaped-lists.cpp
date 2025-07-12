@@ -15,19 +15,22 @@ public:
 class Solution {
   public:
     Node* intersectPoint(Node* head1, Node* head2) {
-        unordered_map<Node*, int> mp;
-        Node* mover1 = head1;
-        while(mover1 != nullptr) {
-            mp[mover1] = 1;
-            mover1 = mover1->next;
+        Node* temp1 = head1;
+        Node* temp2 = head2;
+        // When either pointer reaches the end, redirect it to the 
+        // head of the other list. If there is an intersection, they 
+        // will meet at the intersection node. If there is no 
+        // intersection, both will eventually become nullptr
+        while (temp1 != temp2) {
+            // Move temp1 to next node, or 
+            // to headB if it reaches end of list A
+            temp1 = (temp1) ? temp1->next : head2;
+            // Move temp2 to next node, or 
+            // to headA if it reaches end of list B
+            temp2 = (temp2) ? temp2->next : head1;
         }
-        Node* mover2 = head2;
-        while(mover2 != nullptr) {
-            if(mp.find(mover2) != mp.end()) {
-                return mover2;
-            }
-            mp[mover2] = 1;
-            mover2 = mover2->next;
-        }
+        return temp1;
     }
 };
+
+
