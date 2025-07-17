@@ -1,77 +1,51 @@
-//{ Driver Code Starts
-#include <bits/stdc++.h>
-using namespace std;
-
-// } Driver Code Ends
 
 class Solution {
-  public:
-    // Function to detect cycle in an undirected graph.
-    bool detectCycle(int src, vector<bool>& visited, vector<int> adj[]) {
-        queue<int> q;
-        vector<int> parent(visited.size(), -1);
-        
-        // maintaining initial state : 
-        q.push(src);
-        visited[src] = true;
-        
+private:
+    // Helper function to detect a cycle using BFS from a given source node
+    bool detectCycleBFS(int src, int V, int vis[], vector<vector<int>>& adjList) {
+        vis[src] = 1;  // Mark the source node as visited
+        queue<pair<int, int>> q;  // Stores pairs of (currentNode, parentNode)
+        q.push({src, -1});  // Initialize queue with source node and no parent (-1)
         while(!q.empty()) {
-            int frontNode = q.front();
+            int node = q.front().first;
+            int parent = q.front().second;
             q.pop();
-            
-            for(auto nbr : adj[frontNode]) {
-                if(!visited[nbr]) {
-                    parent[nbr] = frontNode;
-                    visited[nbr] = true;
-                    q.push(nbr);
+            // Traverse all adjacent nodes (neighbors)
+            for(auto nbr : adjList[node]) {
+                if(!vis[nbr]) {
+                    vis[nbr] = 1;  // Mark neighbor as visited
+                    q.push({nbr, node});  // Push neighbor with current node as its parent
                 }
-                else {
-                    if(parent[frontNode] != nbr) return true;
+                // If the neighbor is visited and it's not the parent,
+                // then a cycle exists
+                else if(parent != nbr) {
+                    return true;  // Cycle detected
                 }
             }
         }
-        return false;
-             
+        return false;  // No cycle found from this component
     }
-    
-    bool isCycle(int V, vector<int> adj[]) {
-        // Code here
-        if(V == 0) return false;
-        
-        vector<bool> visited(V, false);
-        
-        for(int i=0; i<V; i++) {
-            if(!visited[i]) {
-                if(detectCycle(i, visited, adj))
+public:
+    // Main function to check if the undirected graph contains a cycle
+    bool isCycle(int V, vector<vector<int>>& edges) {
+        // Step 1: Create an adjacency list from the edge list
+        vector<vector<int>> adjList(V);
+        for(int i = 0; i < edges.size(); i++) {
+            int u = edges[i][0];
+            int v = edges[i][1];
+            adjList[u].push_back(v);
+            adjList[v].push_back(u);  // Since the graph is undirected
+        }
+        int vis[V] = {0};  // Visited array initialized to 0 (unvisited)
+        // Step 2: Check each component of the graph
+        for(int i = 0; i < V; i++) {
+            if(!vis[i]) {
+                // If the component has a cycle, return true
+                if(detectCycleBFS(i, V, vis, adjList)) {
                     return true;
+                }
             }
         }
-        return false;
+        return false;  // No cycles found in any component
     }
 };
-
-
-//{ Driver Code Starts.
-int main() {
-    int tc;
-    cin >> tc;
-    while (tc--) {
-        int V, E;
-        cin >> V >> E;
-        vector<int> adj[V];
-        for (int i = 0; i < E; i++) {
-            int u, v;
-            cin >> u >> v;
-            adj[u].push_back(v);
-            adj[v].push_back(u);
-        }
-        Solution obj;
-        bool ans = obj.isCycle(V, adj);
-        if (ans)
-            cout << "1\n";
-        else
-            cout << "0\n";
-    }
-    return 0;
-}
-// } Driver Code Ends
