@@ -1,71 +1,45 @@
-//{ Driver Code Starts
-#include <bits/stdc++.h>
-using namespace std;
-
-// } Driver Code Ends
-
 class Solution {
-  public:
-    // Function to detect cycle in a directed graph.
-    bool detectCycle(int src, vector<bool>& visited, vector<bool>& dfsTrack, vector<int> adj[]) {
-        visited[src] = true;
-        dfsTrack[src] = true;
-        
-        for(auto nbr : adj[src]) {
-            if(!visited[nbr]) {
-                bool ans = detectCycle(nbr, visited, dfsTrack, adj);
-                if(ans) return true;
+  private:
+    bool dfs(int node, vector<int>& vis, vector<int>& pathVis,
+             vector<vector<int>>& adjList) {
+        vis[node] = 1;        // Mark current node as visited
+        pathVis[node] = 1;    // Mark current node in the recursion stack (path)
+        for(auto& nbr : adjList[node]) {
+            // If neighbor is not visited, do DFS on it
+            if(!vis[nbr]) {
+                if(dfs(nbr, vis, pathVis, adjList)) {
+                    return true; // Cycle detected in DFS subtree
+                } 
             }
-            else if(dfsTrack[nbr]) return true;
+            // If neighbor is visited and also in the current path → cycle found
+            else if(pathVis[nbr] == 1) {
+                return true;
+            }
         }
-        
-        // backtrack : 
-        dfsTrack[src] = false;
-        
+        // Backtrack: remove node from current path
+        pathVis[node] = 0;
         return false;
     }
-    
-    bool isCyclic(int V, vector<int> adj[]) {
-        // code here
-        if(V == 0) return false;
-        
-        vector<bool> visited(V, false);
-        vector<bool> dfsTrack(V, false);
-        
-        for(int node = 0; node < V; node++) {
-            if(!visited[node]) {
-                if(detectCycle(node, visited, dfsTrack, adj)) return true;
+  public:
+    bool isCyclic(int V, vector<vector<int>> &edges) {
+        // Create adjacency list from edges
+        vector<vector<int>> adjList(V);
+        for(int i = 0; i < edges.size(); i++) {
+            int u = edges[i][0];
+            int v = edges[i][1];
+            adjList[u].push_back(v); // Directed edge from u to v
+        }
+        // Arrays to keep track of visited nodes and recursion path
+        vector<int> vis(V, 0);
+        vector<int> pathVis(V, 0);
+        // Run DFS for each unvisited node
+        for(int i = 0; i < V; i++) {
+            if(!vis[i]) {
+                if(dfs(i, vis, pathVis, adjList)) {
+                    return true; // Cycle detected
+                }
             }
         }
-        
-        return false;
+        return false; // No cycle found in any component
     }
 };
-
-
-//{ Driver Code Starts.
-
-int main() {
-
-    int t;
-    cin >> t;
-    while (t--) {
-        int V, E;
-        cin >> V >> E;
-
-        vector<int> adj[V];
-
-        for (int i = 0; i < E; i++) {
-            int u, v;
-            cin >> u >> v;
-            adj[u].push_back(v);
-        }
-
-        Solution obj;
-        cout << obj.isCyclic(V, adj) << "\n";
-    }
-
-    return 0;
-}
-
-// } Driver Code Ends
