@@ -1,107 +1,48 @@
-//{ Driver Code Starts
-#include <bits/stdc++.h>
-using namespace std;
 
-// } Driver Code Ends
-//User function Template for C++
-
-class Solution
-{
-  private:
-    void topoSort(int n, vector<int>& topoOrder, unordered_map<int, list<int>>& adjList) {
-        queue<int> q;
-        vector<int> indegree(n, 0);
-        
-        // storing the indegrees : 
-        for(auto it : adjList) {
-            for(auto nbr : it.second) {
+class Solution {
+  public:
+    vector<int> findOrder(int N, vector<vector<int>> prerequisites) {
+        // Step 1: Create the adjacency list.
+        // If course 'u' has a prerequisite 'v', we draw a directed 
+        // edge from v to u (v -> u)
+        vector<vector<int>> adjList(N);
+        for(int i = 0; i < prerequisites.size(); i++) {
+            int u = prerequisites[i][0]; // course to take
+            int v = prerequisites[i][1]; // prerequisite course
+            adjList[v].push_back(u);
+        }
+        // Step 2: Compute in-degree (number of incoming edges) for each node
+        vector<int> indegree(N, 0);
+        for(int i = 0; i < N; i++) {
+            for(auto nbr : adjList[i]) {
                 indegree[nbr]++;
             }
         }
-        
-        // storing the nodes with zero indegree in the queue : 
-        for(int i=0; i<n; i++) {
-            if(indegree[i] == 0)
+        // Step 3: Initialize a queue with all nodes having 
+        // in-degree 0 (no prerequisites)
+        queue<int> q;
+        for(int i = 0; i < N; i++) {
+            if(indegree[i] == 0) {
                 q.push(i);
+            }
         }
-        
-        // actual bfs logic : 
+        // Step 4: Perform BFS using Kahn's algorithm for Topological Sort
+        vector<int> topo;
         while(!q.empty()) {
-            int frontNode = q.front();
+            int node = q.front();
             q.pop();
-            topoOrder.push_back(frontNode);
-            
-            for(auto nbr : adjList[frontNode]) {
+            topo.push_back(node);
+
+            // Decrease the in-degree of neighboring nodes
+            for(auto nbr : adjList[node]) {
                 indegree[nbr]--;
                 if(indegree[nbr] == 0) {
                     q.push(nbr);
                 }
             }
         }
-    }
-    
-  public:
-    vector<int> findOrder(int n, int m, vector<vector<int>> prerequisites) 
-    {
-        //code here
-        unordered_map<int, list<int>> adjList;
-        for(vector<int> it : prerequisites) {
-            int u = it[0];
-            int v = it[1];
-            adjList[v].push_back(u);
-        }
-        
-        vector<int> topoOrder;
-        topoSort(n, topoOrder, adjList);
-        
-        if(topoOrder.size() == n) return topoOrder;
-        else return {};
+        // Step 5: If all nodes are processed, return the order; 
+        // else return empty array (cycle detected if topo.size() != N)
+        return (topo.size() == N) ? topo : vector<int>{};
     }
 };
-
-
-//{ Driver Code Starts.
-
-int check(int V, vector <int> &res, vector<int> adj[]) {
-    vector<int> map(V, -1);
-    for (int i = 0; i < V; i++) {
-        map[res[i]] = i;
-    }
-    for (int i = 0; i < V; i++) {
-        for (int v : adj[i]) {
-            if (map[i] > map[v]) return 0;
-        }
-    }
-    return 1;
-}
-
-int main() {
-    int T;
-    cin >> T;
-    while (T--) {
-        int n, m;
-        cin >> n >> m;
-        int u, v;
-
-        vector<vector<int>> prerequisites;
-
-        for (int i = 0; i < m; i++) {
-            cin >> u >> v;
-            prerequisites.push_back({u,v});
-        }
-        
-        vector<int> adj[n];
-        for (auto pre : prerequisites)
-            adj[pre[1]].push_back(pre[0]);
-        
-        Solution obj;
-        vector <int> res = obj.findOrder(n, m, prerequisites);
-        if(!res.size())
-            cout<<"No Ordering Possible"<<endl;
-        else
-            cout << check(n, res, adj) << endl;
-    }
-    
-    return 0;
-}
-// } Driver Code Ends
