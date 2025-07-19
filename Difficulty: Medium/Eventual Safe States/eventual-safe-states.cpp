@@ -1,49 +1,46 @@
 // User function Template for C++
 
 class Solution {
-  private:
-    bool dfs(int node, vector<int>& vis, vector<int>& pathVis,
-             vector<int>& checkSafe, vector<int> adj[]) {
-        vis[node] = 1;         // Mark node as visited
-        pathVis[node] = 1;     // Mark node in the current DFS path
-        for (auto nbr : adj[node]) {
-            // If the neighbor has not been visited, call DFS on it
-            if (!vis[nbr]) {
-                if (dfs(nbr, vis, pathVis, checkSafe, adj) == true) {
-                    // If a cycle is detected, mark current node as unsafe
-                    checkSafe[node] = 0;
-                    return true;
-                }
-            }
-            // If neighbor is in the current path, a cycle is found
-            else if (pathVis[nbr] == 1) {
-                checkSafe[node] = 0;
-                return true;
-            }
-        }
-        // Backtrack: remove node from current path
-        pathVis[node] = 0;
-        checkSafe[node] = 1;  // Mark node as safe
-        return false;
-    }
   public:
     vector<int> eventualSafeNodes(int V, vector<int> adj[]) {
-        vector<int> vis(V, 0);        // Marks whether a node has been visited
-        vector<int> pathVis(V, 0);    // Marks nodes in the current DFS path
-        vector<int> checkSafe(V, 0);// Memoization:1 if node is safe, 0 if unsafe
-        vector<int> safeNodes;        // Stores all eventual safe nodes
-        // Run DFS for all unvisited nodes
-        for (int i = 0; i < V; i++) {
-            if (!vis[i]) {
-                dfs(i, vis, pathVis, checkSafe, adj);
+        // Step 1: Reverse the edges of the graph
+        // This helps us find nodes that eventually lead to terminal nodes
+        vector<vector<int>> adjRev(V);
+        for(int i = 0; i < V; i++) {
+            for(auto nbr : adj[i]) {
+                adjRev[nbr].push_back(i); // Reverse the edge
             }
         }
-        // Collect all safe nodes
-        for (int i = 0; i < V; i++) {
-            if (checkSafe[i] == 1) {
-                safeNodes.push_back(i);
+        // Step 2: Create indegree array for reversed graph
+        vector<int> indegree(V, 0);
+        for(int i = 0; i < V; i++) {
+            for(auto nbr : adjRev[i]) {
+                indegree[nbr]++;
             }
         }
+        // Step 3: Add all nodes with 0 indegree in reversed graph to the queue
+        queue<int> q;
+        for(int i = 0; i < V; i++) {
+            if(indegree[i] == 0) {
+                q.push(i); // These are terminal nodes in original graph
+            }
+        }
+        // Step 4: Perform BFS (Kahn's Algorithm) on the reversed graph
+        vector<int> safeNodes;
+        while(!q.empty()) {
+            int node = q.front();
+            q.pop();
+            safeNodes.push_back(node); // Node is safe
+            // Reduce the indegree of neighbours
+            for(auto nbr : adjRev[node]) {
+                indegree[nbr]--;
+                if(indegree[nbr] == 0) {
+                    q.push(nbr);
+                }
+            }
+        }
+        // Step 5: Sort the result to return nodes in increasing order
+        sort(safeNodes.begin(), safeNodes.end());
         return safeNodes;
     }
 };
