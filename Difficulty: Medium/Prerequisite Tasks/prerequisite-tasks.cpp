@@ -1,86 +1,43 @@
-//{ Driver Code Starts
-#include<bits/stdc++.h>
-using namespace std;
-
-// } Driver Code Ends
 class Solution {
-private:
-    void topoSort(int n, vector<int>& topoOrder, unordered_map<int, list<int>>& adjList) {
-        queue<int> q;
-        vector<int> indegree(n, 0);
-        
-        // storing the indegrees : 
-        for(auto it : adjList) {
-            for(auto nbr : it.second) {
+  public:
+    bool isPossible(int N, int P, vector<pair<int, int> >& prerequisites) {
+        // Step 1: Create the adjacency list
+        // For a prerequisite pair {u, v}, course 'u' depends on course 'v' → edge: v -> u
+        vector<vector<int>> adjList(N);
+        for(auto it : prerequisites) {
+            adjList[it.second].push_back(it.first);   
+        }
+        // Step 2: Compute the in-degree of each node
+        vector<int> indegree(N, 0);
+        for(int i = 0; i < N; i++) {
+            for(auto nbr : adjList[i]) {
                 indegree[nbr]++;
             }
-        } 
-        
-        // storing the nodes with zero indegree in the queue : 
-        for(int i=0; i<n; i++) {
-            if(indegree[i] == 0) 
-                q.push(i);
         }
-        
-        // actual logic of bfs : 
-        while(!q.empty()) {
-            int frontNode = q.front();
-            q.pop();
-            topoOrder.push_back(frontNode);
-            
-            for(auto nbr : adjList[frontNode]) {
-                indegree[nbr]--;
-                if(indegree[nbr] == 0) 
-                    q.push(nbr);
+        // Step 3: Push all nodes with in-degree 0 into the queue
+        queue<int> q;
+        for(int i = 0; i < N; i++) {
+            if(indegree[i] == 0) {
+                q.push(i);
             }
         }
-    }
+        // Step 4: Perform Kahn's Algorithm (BFS-based Topological Sort)
+        vector<int> topo;
+        while(!q.empty()) {
+            int node = q.front();
+            q.pop();
+            topo.push_back(node);
 
-public:
-	bool isPossible(int N,int P, vector<pair<int, int> >& prerequisites) {
-	    // Code here
-	    
-	    // preparing the adjacency list : 
-	    unordered_map<int, list<int>> adjList;
-	    for(auto it : prerequisites) {
-	        int u = it.first;
-	        int v = it.second;
-	        adjList[v].push_back(u);
-	    }
-	    
-	    // preparing the topologically sorted order : 
-	    vector<int> topoOrder;
-	    topoSort(N, topoOrder, adjList);
-	    
-	    // if topo logi
-	    if(topoOrder.size() == N) return true;
-	    else return false;
-	}
-};
-
-//{ Driver Code Starts.
-int main(){
-	int tc;
-	cin >> tc;
-	while(tc--){
-    	int N, P;
-        vector<pair<int, int> > prerequisites;
-        cin >> N;
-        cin >> P;
-        for (int i = 0; i < P; ++i) {
-            int x, y;
-            cin >> x >> y;
-            prerequisites.push_back(make_pair(x, y));
+            // Reduce in-degree of adjacent nodes
+            for(auto nbr : adjList[node]) {
+                indegree[nbr]--;
+                if(indegree[nbr] == 0) {
+                    q.push(nbr);
+                }
+            }
         }
-        // string s;
-        // cin>>s;
-        Solution ob;
-        if (ob.isPossible(N,P, prerequisites))
-            cout << "Yes";
-        else
-            cout << "No";
-        cout << endl;
-	}
-	return 0;
-}
-// } Driver Code Ends
+        // Step 5: If topological sort includes all N nodes, then no cycle exists
+        // Hence, it's possible to finish all courses
+        return (topo.size() == N);
+    }
+};
