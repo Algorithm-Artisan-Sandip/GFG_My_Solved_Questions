@@ -8,10 +8,10 @@ class Solution {
             adjList[it[0]].push_back({it[1], it[2]}); // Undirected edge
             adjList[it[1]].push_back({it[0], it[2]});
         }
-        // Step 2: Min-heap (priority queue) to pick the next node with the shortest distance
-        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+        // Step 2: Set to pick the next node with the shortest distance
+        set<pair<int, int>> st;
         // Push the source node (1) with distance 0
-        pq.push({0, 1});
+        st.insert({0, 1});
         // Step 3: Distance array to store shortest distance from source to every node
         vector<int> dist(n + 1, INT_MAX);
         // Step 4: Parent array to reconstruct the shortest path later
@@ -21,18 +21,22 @@ class Solution {
         }
         dist[1] = 0;  // Distance to the source node is 0
         // Step 5: Dijkstra’s Algorithm main loop
-        while (!pq.empty()) {
-            int wt = pq.top().first;   // Current distance from source
-            int node = pq.top().second;
-            pq.pop();
+        while (!st.empty()) {
+            auto first = *(st.begin());
+            int wt = first.first;   // Current distance from source
+            int node = first.second;
+            st.erase(first);
             // Traverse through all adjacent nodes
             for (auto nbr : adjList[node]) {
                 int currWt = nbr.second;    // Weight of the edge to neighbour
                 int nbrNode = nbr.first;
                 // If a shorter path is found to neighbour
                 if (wt + currWt < dist[nbrNode]) {
+                    if(dist[nbrNode] != INT_MAX) {
+                        st.erase({dist[nbrNode], nbrNode});
+                    }
                     dist[nbrNode] = wt + currWt;   // Update distance
-                    pq.push({dist[nbrNode], nbrNode});  // Push updated distance into the min-heap
+                    st.insert({dist[nbrNode], nbrNode});
                     parent[nbrNode] = node;  // Store the parent for path reconstruction
                 }
             }
