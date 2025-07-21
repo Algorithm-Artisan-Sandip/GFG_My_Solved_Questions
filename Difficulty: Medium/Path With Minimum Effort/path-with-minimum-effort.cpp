@@ -1,93 +1,54 @@
-//{ Driver Code Starts
-#include <bits/stdc++.h>
-using namespace std;
-
-class Matrix {
-  public:
-    template <class T>
-    static void input(vector<vector<T>> &A, int n, int m) {
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                scanf("%d ", &A[i][j]);
-            }
-        }
-    }
-
-    template <class T>
-    static void print(vector<vector<T>> &A) {
-        for (int i = 0; i < A.size(); i++) {
-            for (int j = 0; j < A[i].size(); j++) {
-                cout << A[i][j] << " ";
-            }
-            cout << endl;
-        }
-    }
-};
-
-
-// } Driver Code Ends
 
 class Solution {
   public:
-    int MinimumEffort(int n, int m, vector<vector<int>> &heights) {
-        // code here
-        vector<vector<int>> diff(n, vector<int>(m, INT_MAX));
-        diff[0][0] = 0;
-        
-        int row[] = {-1, 0, +1, 0};
-        int col[] = {0, +1, 0, -1};
-        
-        priority_queue<pair<int, pair<int, int>>, vector<pair<int, pair<int, int>>>, greater<pair<int, pair<int, int>>>> pq;
+    int MinimumEffort(int rows, int columns, vector<vector<int>>& heights) {
+        // effort[r][c] = minimum over all paths from (0,0) to (r,c)
+        //                of the maximum |height difference| along that path
+        vector<vector<int>> effort(rows, vector<int>(columns, INT_MAX));
+        // Min-heap storing (effort_so_far, (row, col))
+        priority_queue<
+            pair<int, pair<int,int>>,
+            vector<pair<int, pair<int,int>>>,
+            greater<pair<int, pair<int,int>>>
+        > pq;
+        // Start at (0,0) with zero effort
+        effort[0][0] = 0;
         pq.push({0, {0, 0}});
-        
-        while(!pq.empty()) {
-            auto topNode = pq.top();
+        // Direction vectors for Up, Right, Down, Left
+        int dRow[4] = {-1, 0, +1, 0};
+        int dCol[4] = {0, +1, 0, -1};
+        while (!pq.empty()) {
+            // 1) Pop the cell with the current smallest “effort so far”
+            auto front = pq.top(); 
             pq.pop();
-            int currDiff = topNode.first;
-            int r = topNode.second.first;
-            int c = topNode.second.second;
-            
-            for(int i=0; i<4; i++) {
-                int newRow = r + row[i];
-                int newCol = c + col[i];
-                
-                if(newRow >= 0 && newCol >= 0 && newRow < n && newCol < m) {
-                    int newDiff = max(currDiff, abs(heights[r][c]-heights[newRow][newCol]));
-                    
-                    if(newDiff < diff[newRow][newCol]) {
-                        diff[newRow][newCol] = newDiff;
-                        pq.push({newDiff, {newRow, newCol}});
-                    }
+            int currEffort = front.first;
+            int r = front.second.first;
+            int c = front.second.second;
+            // 2) If we reached bottom-right, we have the minimum possible effort
+            if (r == rows - 1 && c == columns - 1) 
+                return currEffort;
+            // 3) Skip stale entries where we already found a better effort
+            if (currEffort > effort[r][c]) 
+                continue;
+            // 4) Explore neighbors
+            for (int i = 0; i < 4; ++i) {
+                int nr = r + dRow[i];
+                int nc = c + dCol[i];
+                // 5) Check bounds
+                if (nr < 0 || nr >= rows || nc < 0 || nc >= columns) 
+                    continue;
+                // 6) Compute edge effort = height difference between cells
+                int diff = abs(heights[nr][nc] - heights[r][c]);
+                // 7) Path effort to neighbor is max of current path’s effort and this edge’s
+                int newEffort = max(currEffort, diff);
+                // 8) Relax if we can improve the neighbor’s recorded effort
+                if (newEffort < effort[nr][nc]) {
+                    effort[nr][nc] = newEffort;
+                    pq.push({newEffort, {nr, nc}});
                 }
             }
         }
-        
-        return diff[n-1][m-1];
+        // Should never happen on a non-empty grid, but return 0 as fallback
+        return 0;
     }
 };
-
-
-//{ Driver Code Starts.
-
-int main() {
-    int t;
-    scanf("%d ", &t);
-    while (t--) {
-
-        int rows;
-        scanf("%d", &rows);
-
-        int columns;
-        scanf("%d", &columns);
-
-        vector<vector<int>> heights(rows, vector<int>(columns));
-        Matrix::input(heights, rows, columns);
-
-        Solution obj;
-        int res = obj.MinimumEffort(rows, columns, heights);
-
-        cout << res << endl;
-    }
-}
-
-// } Driver Code Ends
