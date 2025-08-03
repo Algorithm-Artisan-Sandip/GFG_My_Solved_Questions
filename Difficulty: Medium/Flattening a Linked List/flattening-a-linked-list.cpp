@@ -15,28 +15,39 @@ struct Node{
 */
 
 class Solution {
+  private:
+    Node* mergeTwoList(Node* list1, Node* list2) {
+        Node* dummyNode = new Node(0);
+        Node* res = dummyNode;
+        while(list1 != nullptr && list2 != nullptr) {
+            if(list1->data < list2->data) {
+                res->bottom = list1;
+                res = list1;
+                list1 = list1->bottom;
+            }
+            else {
+                res->bottom = list2;
+                res = list2;
+                list2 = list2->bottom;
+            }
+            res->next = nullptr;
+        }
+        if(list1) res->bottom = list1;
+        else res->bottom = list2;
+        
+        Node* head = dummyNode->bottom;
+        delete dummyNode;
+        return head;
+    }
+    Node* recursive(Node* head) {
+        if(head == nullptr || head->next == nullptr)
+            return head;
+        Node* mergedHead = recursive(head->next);
+        return mergeTwoList(head, mergedHead);
+    }
   public:
     Node *flatten(Node *root) {
-        vector<int> arr;
-        Node* horizontal = root;
-        while(horizontal != nullptr) {
-            arr.push_back(horizontal->data);
-            Node* vertical = horizontal->bottom;
-            while(vertical != nullptr) {
-                arr.push_back(vertical->data);
-                vertical = vertical->bottom;
-            }
-            horizontal = horizontal->next;
-        }
-        sort(arr.begin(), arr.end());
-        Node* dummy = new Node(0);
-        Node* temp = dummy;
-        for(auto val : arr) {
-            temp->bottom = new Node(val);
-            temp = temp->bottom;
-        }
-        Node* head = dummy->bottom;
-        delete dummy;
+        Node* head = recursive(root);
         return head;
     }
 };
