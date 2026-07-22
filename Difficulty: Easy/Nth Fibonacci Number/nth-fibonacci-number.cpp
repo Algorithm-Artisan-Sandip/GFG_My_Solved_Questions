@@ -1,44 +1,15 @@
-//{ Driver Code Starts
-// Initial Template for C++
-#include <bits/stdc++.h>
-using namespace std;
-
-// } Driver Code Ends
-// User function Template for C++
-
+// Memorization : Top-Down Approach
 class Solution {
+  private:
+    int nthFibonacciHelper(int n, vector<int>& dp) {
+    if(n <= 1) return n;
+    if(dp[n] != -1) return dp[n];
+    return dp[n] = nthFibonacciHelper(n-1, dp) + nthFibonacciHelper(n-2, dp);
+    }
   public:
-    int nthFibonacci(int n){
+    int nthFibonacci(int n) {
         // code here
-        if(n == 0) return 0;
-        if(n == 1) return 1;
-        
-        const int modu = 1000000007;
-        
-        int prev1 = 0;
-        int prev2 = 1;
-        int curr;
-        for(int i=2; i<=n; i++) {
-            curr = (prev1 + prev2) % modu;
-            prev1 = prev2;
-            prev2 = curr;
-        }
-        return curr;
+        vector<int> dp(n+1, -1);
+        return nthFibonacciHelper(n, dp);
     }
 };
-
-
-//{ Driver Code Starts.
-int main() {
-    int t;
-    cin >> t;
-    while (t--) {
-        int n;
-        cin >> n;
-        Solution ob;
-        cout << ob.nthFibonacci(n) << endl;
-    }
-    return 0;
-}
-
-// } Driver Code Ends
